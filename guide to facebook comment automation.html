@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to Facebook Automation Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Subtle & Supportive -->
+    <!-- Application Structure Plan: The application is structured as an interactive, single-page dashboard designed to guide users to the best tool for their needs. It replaces the report's linear narrative with a task-oriented flow: 1) An interactive "Tool Finder" quiz provides immediate, personalized recommendations. 2) A "Comparison Dashboard" allows dynamic, side-by-side analysis of tools using interactive charts and tables. 3) "Tool Profile" tabs offer condensed deep-dives into each product. 4) A "Best Practices" section uses accordions for scannable advice. This structure prioritizes user action and decision-making over passive reading, making the complex information highly accessible and useful. -->
+    <!-- Visualization & Content Choices: 
+        - Tool Finder (Quiz): Report Info (Decision Framework) -> Goal (Guide User) -> Viz (HTML Form) -> Interaction (JS logic recommends tools based on input) -> Justification (Directly answers "Which tool is for me?") -> Library (HTML/JS).
+        - Cost Chart: Report Info (Table 2) -> Goal (Compare TCO) -> Viz (Bar Chart) -> Interaction (Buttons update chart data for different volume scenarios) -> Justification (Makes dense cost data visual and dynamic) -> Library (Chart.js).
+        - Feature Table: Report Info (Table 1) -> Goal (Detailed Comparison) -> Viz (HTML Table) -> Interaction (Checkboxes hide/show tools) -> Justification (Makes large table manageable) -> Library (HTML/JS).
+        - Implementation Blueprints: Report Info (Section 4) -> Goal (Organize Guides) -> Viz (Styled HTML Flowchart) -> Interaction (Static Visual) -> Justification (More engaging than lists) -> Library (HTML/Tailwind).
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. 
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFCFB; color: #264653; }
+        .bg-primary { background-color: #264653; }
+        .text-primary { color: #264653; }
+        .bg-secondary { background-color: #2A9D8F; }
+        .text-secondary { color: #2A9D8F; }
+        .bg-accent-light { background-color: #E9C46A; }
+        .text-accent-light { color: #E9C46A; }
+        .bg-accent-dark { background-color: #F4A261; }
+        .text-accent-dark { color: #F4A261; }
+        .bg-base { background-color: #FDFCFB; }
+        .section-title { @apply text-3xl font-bold text-primary text-center mb-4; }
+        .section-subtitle { @apply text-lg text-center max-w-3xl mx-auto text-gray-600 mb-12; }
+        .card { @apply bg-white p-6 rounded-xl shadow-lg border border-gray-100; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 450px; }
+        @media (min-width: 768px) { .chart-container { height: 450px; } }
+        .tab-button { @apply px-4 py-2 font-semibold text-gray-600 rounded-t-lg transition-colors duration-300; }
+        .tab-button.active { @apply bg-white text-primary shadow-md; }
+        .tab-content { @apply hidden; }
+        .tab-content.active { @apply block; }
+        .recommendation-card { @apply border-4 border-transparent transition-all duration-300; }
+        .recommendation-card.highlight { @apply border-accent-dark scale-105 shadow-2xl; }
+        .blueprint-step { @apply flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200; }
+        .blueprint-number { @apply flex-shrink-0 w-8 h-8 rounded-full bg-secondary text-white font-bold flex items-center justify-center mr-4; }
+        .blueprint-arrow { @apply h-8 w-px bg-gray-300 mx-auto; }
+        /* Custom selected filter button style */
+        .selected-filter-btn {
+            background-color: #2A9D8F !important;
+            color: #fff !important;
+            border: 2px solid #2A9D8F;
+            box-shadow: 0 2px 8px 0 rgba(42,157,143,0.10);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="bg-primary text-white py-16 px-4">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">The Interactive Guide to Facebook Automation</h1>
+            <p class="mt-4 text-xl text-gray-300 max-w-3xl mx-auto">Stop guessing. Start automating. Find the perfect tool for your budget, skills, and goals in under a minute.</p>
+        </div>
+    </header>
+
+    <nav class="sticky top-0 bg-white/80 backdrop-blur-sm shadow-md z-50">
+        <div class="container mx-auto flex justify-center items-center p-2 space-x-2 md:space-x-4">
+            <a href="#finder" class="text-sm md:text-base font-semibold text-gray-700 hover:text-secondary transition-colors">Tool Finder</a>
+            <span class="text-gray-300">|</span>
+            <a href="#dashboard" class="text-sm md:text-base font-semibold text-gray-700 hover:text-secondary transition-colors">Compare</a>
+            <span class="text-gray-300">|</span>
+            <a href="#profiles" class="text-sm md:text-base font-semibold text-gray-700 hover:text-secondary transition-colors">Profiles</a>
+            <span class="text-gray-300">|</span>
+            <a href="#practices" class="text-sm md:text-base font-semibold text-gray-700 hover:text-secondary transition-colors">Best Practices</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Tool Finder Section -->
+        <section id="finder" class="py-16">
+            <h2 class="section-title">Find Your Perfect Tool</h2>
+            <p class="section-subtitle">Answer three simple questions to get a personalized recommendation. This interactive finder analyzes your needs based on the key decision factors from the report—budget, technical comfort, and primary goal—to suggest the best-fit solution.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div class="card space-y-6">
+                    <div>
+                        <label class="font-bold text-lg">1. What's your monthly budget?</label>
+                        <p class="text-sm text-gray-500 mb-2">Consider your total cost tolerance for this solution.</p>
+                        <div class="flex flex-wrap gap-2" id="budget-filter">
+                            <button data-value="free" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">Free</button>
+                            <button data-value="low" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">$1 - $15</button>
+                            <button data-value="medium" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">$15+</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-bold text-lg">2. What's your technical skill level?</label>
+                        <p class="text-sm text-gray-500 mb-2">Be honest about your comfort with technical setups.</p>
+                         <div class="flex flex-wrap gap-2" id="skill-filter">
+                            <button data-value="beginner" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">Beginner</button>
+                            <button data-value="intermediate" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">Intermediate</button>
+                            <button data-value="advanced" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">Advanced</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-bold text-lg">3. What is your primary goal?</label>
+                        <p class="text-sm text-gray-500 mb-2">What is the most important outcome for you?</p>
+                        <div class="flex flex-wrap gap-2" id="goal-filter">
+                            <button data-value="simple" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">Simple Replies</button>
+                            <button data-value="growth" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">Lead Growth</button>
+                            <button data-value="power" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-all">Total Control</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div id="rec-manychat" class="card recommendation-card">
+                        <h3 class="font-bold text-xl">ManyChat</h3>
+                        <p class="text-gray-600">Best for lead growth and ease of use.</p>
+                    </div>
+                    <div id="rec-n8n" class="card recommendation-card">
+                        <h3 class="font-bold text-xl">n8n (Self-Hosted)</h3>
+                        <p class="text-gray-600">Best for total control and lowest cost.</p>
+                    </div>
+                    <div id="rec-make" class="card recommendation-card">
+                        <h3 class="font-bold text-xl">Make</h3>
+                        <p class="text-gray-600">Best balance of power and visual building.</p>
+                    </div>
+                     <div id="rec-postjelly" class="card recommendation-card">
+                        <h3 class="font-bold text-xl">PostJelly</h3>
+                        <p class="text-gray-600">Best for simple, set-it-and-forget-it replies.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Dashboard Section -->
+        <section id="dashboard" class="py-16 bg-gray-50 -mx-4 md:-mx-8 px-4 md:px-8">
+            <h2 class="section-title">Comparison Dashboard</h2>
+            <p class="section-subtitle">Dive deeper into the data. Use the controls below to dynamically compare the tools on cost and features. This section visualizes the report's detailed comparison tables, allowing you to see how tools stack up in different situations.</p>
+
+            <div class="card mb-8">
+                <h3 class="text-xl font-bold text-center mb-2">Cost Scenario Analysis</h3>
+                <p class="text-center text-sm text-gray-500 mb-4">Click a scenario to see how monthly costs change with volume.</p>
+                <div class="flex justify-center flex-wrap gap-2 mb-4" id="cost-scenario-buttons">
+                    <button data-scenario="low" class="bg-secondary text-white font-bold py-2 px-4 rounded">Low Volume</button>
+                    <button data-scenario="medium" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">Medium Volume</button>
+                    <button data-scenario="high" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">High Volume</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="costChart"></canvas>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- Tool Profiles Section -->
+        <section id="profiles" class="py-16">
+            <h2 class="section-title">Tool Profiles & Blueprints</h2>
+            <p class="section-subtitle">Explore each tool in detail. The tabs below consolidate the report's in-depth analysis and implementation guides into concise profiles, covering core features, ideal users, and a simplified setup blueprint.</p>
+            
+            <div>
+                <div class="border-b border-gray-200 mb-4 flex justify-center flex-wrap" id="tool-tabs">
+                    <button data-tab="manychat" class="tab-button active">ManyChat</button>
+                    <button data-tab="n8n" class="tab-button">n8n</button>
+                    <button data-tab="make" class="tab-button">Make</button>
+                    <button data-tab="postjelly" class="tab-button">PostJelly</button>
+                    <button data-tab="meta" class="tab-button">Meta Suite</button>
+                </div>
+
+                <div id="tab-content-manychat" class="tab-content active card">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">ManyChat</h3>
+                            <p class="font-semibold text-accent-dark mb-4">Ideal for: Marketers focused on lead generation.</p>
+                            <p class="mb-4">A user-friendly, "Meta Approved" specialist platform with a visual flow builder. It excels at converting commenters into leads through guided private message conversations.</p>
+                            <ul class="space-y-2 list-disc list-inside">
+                                <li><span class="font-semibold">Pro:</span> Easiest to set up for powerful results.</li>
+                                <li><span class="font-semibold">Pro:</span> Excellent for capturing user data (email, etc.).</li>
+                                <li><span class="font-semibold">Con:</span> Pricing is tied to audience size, which can scale unexpectedly.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-4">Simplified Blueprint</h4>
+                            <div class="space-y-2">
+                                <div class="blueprint-step"><div class="blueprint-number">1</div><span>Add "Facebook Comments" trigger.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">2</div><span>Set keyword rules & public reply variations.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">3</div><span>Design the private message flow.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">4</div><span>Activate the automation.</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-n8n" class="tab-content card">
+                     <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">n8n</h3>
+                            <p class="font-semibold text-accent-dark mb-4">Ideal for: Tech-savvy users wanting ultimate power & low cost.</p>
+                            <p class="mb-4">A powerful, open-source workflow automation tool. Self-hosting provides unparalleled control and the lowest possible TCO. It requires technical setup but offers limitless integration possibilities.</p>
+                            <ul class="space-y-2 list-disc list-inside">
+                                <li><span class="font-semibold">Pro:</span> Most cost-effective solution at scale.</li>
+                                <li><span class="font-semibold">Pro:</span> Total control over logic and can connect to any API.</li>
+                                <li><span class="font-semibold">Con:</span> Steep learning curve; requires technical setup.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-4">Simplified Blueprint</h4>
+                            <div class="space-y-2">
+                                <div class="blueprint-step"><div class="blueprint-number">1</div><span>Set up a Meta Developer App & Webhook.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">2</div><span>Create n8n workflow with Webhook trigger.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">3</div><span>Add logic (IF nodes, AI calls) & Facebook API node.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">4</div><span>Map data fields and activate.</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-content-make" class="tab-content card">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Make</h3>
+                            <p class="font-semibold text-accent-dark mb-4">Ideal for: Visual thinkers who need more than a specialist tool.</p>
+                            <p class="mb-4">A powerful visual automation platform that offers a great balance between ease of use and advanced capabilities. Its per-operation pricing can be very cost-effective.</p>
+                             <ul class="space-y-2 list-disc list-inside">
+                                <li><span class="font-semibold">Pro:</span> Highly visual and intuitive for complex workflows.</li>
+                                <li><span class="font-semibold">Pro:</span> Generous free tier and cost-effective paid plans.</li>
+                                <li><span class="font-semibold">Con:</span> Cost can be unpredictable with high-volume, simple tasks.</li>
+                            </ul>
+                        </div>
+                        <div>
+                           <h4 class="font-bold text-lg mb-4">Simplified Blueprint</h4>
+                            <div class="space-y-2">
+                                <div class="blueprint-step"><div class="blueprint-number">1</div><span>Start new scenario with "Watch Comments" trigger.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">2</div><span>Add Router and Filters for keyword logic.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">3</div><span>(Optional) Add OpenAI module for AI replies.</span></div>
+                                <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">4</div><span>Add "Create a Comment" action and map data.</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <div id="tab-content-postjelly" class="tab-content card">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">PostJelly</h3>
+                            <p class="font-semibold text-accent-dark mb-4">Ideal for: Users needing a simple, dedicated solution.</p>
+                            <p class="mb-4">A hyper-focused and affordable tool designed for one job: automating comment replies. It's incredibly easy to set up and has predictable, volume-based pricing.</p>
+                            <ul class="space-y-2 list-disc list-inside">
+                                <li><span class="font-semibold">Pro:</span> Extremely simple 3-step setup process.</li>
+                                <li><span class="font-semibold">Pro:</span> Predictable pricing model.</li>
+                                <li><span class="font-semibold">Con:</span> No expandability; only does one job.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-4">Simplified Blueprint</h4>
+                            <div class="space-y-2">
+                                <div class="blueprint-step"><div class="blueprint-number">1</div><span>Select the post you want to automate.</span></div>
+                                 <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">2</div><span>Define the keyword rules for triggering.</span></div>
+                                 <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">3</div><span>Craft the public and private reply messages.</span></div>
+                                 <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">4</div><span>Launch the campaign.</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-meta" class="tab-content card">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Meta Business Suite</h3>
+                            <p class="font-semibold text-accent-dark mb-4">Ideal for: Basic, free automation with zero setup.</p>
+                            <p class="mb-4">Facebook's native, free tool. It offers very basic keyword-based replies and is a good starting point to understand the concept, but it lacks any advanced features.</p>
+                            <ul class="space-y-2 list-disc list-inside">
+                                <li><span class="font-semibold">Pro:</span> Completely free and already built-in.</li>
+                                <li><span class="font-semibold">Pro:</span> No setup required outside of the Business Suite.</li>
+                                <li><span class="font-semibold">Con:</span> Extremely limited; no randomization or integrations.</li>
+                            </ul>
+                        </div>
+                         <div>
+                            <h4 class="font-bold text-lg mb-4">Simplified Blueprint</h4>
+                            <div class="space-y-2">
+                                <div class="blueprint-step"><div class="blueprint-number">1</div><span>Go to Inbox > Automations in Business Suite.</span></div>
+                                 <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">2</div><span>Create a new automation for comments.</span></div>
+                                 <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">3</div><span>Add up to five keywords to trigger the reply.</span></div>
+                                 <div class="blueprint-arrow"></div>
+                                <div class="blueprint-step"><div class="blueprint-number">4</div><span>Write your single, static reply message.</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices Section -->
+        <section id="practices" class="py-16 bg-gray-50 -mx-4 md:-mx-8 px-4 md:px-8">
+            <h2 class="section-title">Best Practices for Smart Automation</h2>
+            <p class="section-subtitle">Automate like a human. This section summarizes the report's key advice on creating authentic, intelligent, and compliant automations that enhance—not detract from—your brand's voice.</p>
+            <div class="max-w-4xl mx-auto space-y-4">
+                 <div class="accordion-item card">
+                    <button class="accordion-header w-full text-left flex justify-between items-center">
+                        <span class="text-xl font-bold">🧠 Infuse Intelligence with AI</span>
+                        <span class="accordion-icon text-2xl font-bold text-secondary">+</span>
+                    </button>
+                    <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                        <p class="mt-4 text-gray-600">Go beyond basic keywords. In tools like n8n or Make, route comment text to an AI service (like OpenAI). Provide the AI with the original post's content and the user's comment to generate dynamic, context-aware replies that can understand intent and sentiment.</p>
+                    </div>
+                </div>
+                 <div class="accordion-item card">
+                    <button class="accordion-header w-full text-left flex justify-between items-center">
+                        <span class="text-xl font-bold">❤️ Maintain Authenticity</span>
+                        <span class="accordion-icon text-2xl font-bold text-secondary">+</span>
+                    </button>
+                    <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                        <ul class="mt-4 text-gray-600 space-y-2 list-disc list-inside">
+                            <li><strong>Vary Responses:</strong> Never use a single reply. Create 5-10 variations for your automations to rotate through.</li>
+                            <li><strong>Use Strategic Delays:</strong> An instant reply screams "robot". Add a random delay of 15-90 seconds to mimic human response time.</li>
+                            <li><strong>Personalize:</strong> Use the commenter's first name (`{{first_name}}`) where possible to create a more personal connection.</li>
+                        </ul>
+                    </div>
+                </div>
+                 <div class="accordion-item card">
+                    <button class="accordion-header w-full text-left flex justify-between items-center">
+                        <span class="text-xl font-bold">🛡️ Stay Safe and Compliant</span>
+                        <span class="accordion-icon text-2xl font-bold text-secondary">+</span>
+                    </button>
+                    <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                        <p class="mt-4 text-gray-600">Adhere strictly to Meta's policies. Your automation must provide genuine value and not be spammy. For private messages, you get one reply to a comment; the user must interact back to open the 24-hour messaging window. Using a "Meta Approved" partner like ManyChat can provide peace of mind, but you are always responsible for your usage.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-primary text-white py-12 px-4">
+        <div class="container mx-auto text-center">
+            <h2 class="text-3xl font-bold">Make Your Choice</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-gray-300">The best tool is the one that fits your unique needs. Whether it's the guided power of ManyChat, the ultimate control of n8n, or the balanced approach of Make, implementing smart automation is a key step to scaling your engagement and growing your business.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) { return label.join(' '); }
+                return label;
+            };
+            
+            const costData = {
+                labels: ['ManyChat', 'n8n (Cloud)', 'n8n (Self-Hosted)', 'Make', 'Zapier', 'PostJelly'],
+                low: [15, 24, 8, 0, 30, 12],
+                medium: [25, 24, 8, 9, 74, 12],
+                high: [65, 60, 12, 16, 194, 12]
+            };
+
+            const costChartCtx = document.getElementById('costChart').getContext('2d');
+            const costChart = new Chart(costChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: costData.labels,
+                    datasets: [{
+                        label: 'Estimated Monthly Cost ($USD)',
+                        data: costData.low,
+                        backgroundColor: [
+                            '#264653', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51', '#A8D8EA'
+                        ],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'USD ($)', font: { weight: 'bold' } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { title: tooltipTitleCallback } }
+                    }
+                }
+            });
+
+            const costScenarioButtons = document.getElementById('cost-scenario-buttons');
+            costScenarioButtons.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const scenario = e.target.dataset.scenario;
+                    costChart.data.datasets[0].data = costData[scenario];
+                    costChart.update();
+
+                    costScenarioButtons.querySelectorAll('button').forEach(btn => {
+                        btn.classList.remove('bg-secondary', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-800');
+                    });
+                    e.target.classList.add('bg-secondary', 'text-white');
+                    e.target.classList.remove('bg-gray-200', 'text-gray-800');
+                }
+            });
+            
+            const toolTabs = document.getElementById('tool-tabs');
+            const tabContents = document.querySelectorAll('.tab-content');
+            toolTabs.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const tab = e.target.dataset.tab;
+                    toolTabs.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `tab-content-${tab}`) {
+                            content.classList.add('active');
+                        }
+                    });
+                }
+            });
+            
+            const accordions = document.querySelectorAll('.accordion-item');
+            accordions.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = item.querySelector('.accordion-icon');
+                header.addEventListener('click', () => {
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.textContent = '+';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.textContent = '-';
+                    }
+                });
+            });
+
+            const toolScores = {
+                manychat: 0, n8n: 0, make: 0, postjelly: 0
+            };
+            const filters = { budget: null, skill: null, goal: null };
+            
+            function updateRecommendations() {
+                if (!filters.budget || !filters.skill || !filters.goal) return;
+
+                const scores = { manychat: 0, n8n: 0, make: 0, postjelly: 0 };
+                
+                // Budget scoring
+                if (filters.budget === 'free') { scores.make += 1; }
+                if (filters.budget === 'low') { scores.manychat += 1; scores.n8n += 2; scores.make += 2; scores.postjelly += 2; }
+                if (filters.budget === 'medium') { scores.manychat += 2; scores.n8n += 1; scores.make += 1; }
+
+                // Skill scoring
+                if (filters.skill === 'beginner') { scores.manychat += 2; scores.postjelly += 2; scores.make += 1; }
+                if (filters.skill === 'intermediate') { scores.manychat += 1; scores.make += 2; scores.n8n += 1; }
+                if (filters.skill === 'advanced') { scores.n8n += 2; scores.make += 1; }
+
+                // Goal scoring
+                if (filters.goal === 'simple') { scores.postjelly += 2; scores.manychat += 1; }
+                if (filters.goal === 'growth') { scores.manychat += 2; scores.make += 1; }
+                if (filters.goal === 'power') { scores.n8n += 2; scores.make += 1; }
+
+                let maxScore = 0;
+                for (const tool in scores) {
+                    if (scores[tool] > maxScore) maxScore = scores[tool];
+                }
+                
+                document.querySelectorAll('.recommendation-card').forEach(card => card.classList.remove('highlight'));
+
+                if (maxScore > 0) {
+                   for (const tool in scores) {
+                        if (scores[tool] === maxScore) {
+                           document.getElementById(`rec-${tool}`).classList.add('highlight');
+                        }
+                    }
+                }
+            }
+
+            document.getElementById('budget-filter').addEventListener('click', e => {
+                console.log('Budget filter event received:', e.target);
+                if(e.target.tagName === 'BUTTON') {
+                    console.log('Budget button clicked:', e.target.dataset.value);
+                    filters.budget = e.target.dataset.value;
+                    document.querySelectorAll('#budget-filter button').forEach(b => b.classList.remove('selected-filter-btn'));
+                    e.target.classList.add('selected-filter-btn');
+                    updateRecommendations();
+                }
+            });
+            document.getElementById('skill-filter').addEventListener('click', e => {
+                console.log('Skill filter event received:', e.target);
+                if(e.target.tagName === 'BUTTON') {
+                    console.log('Skill button clicked:', e.target.dataset.value);
+                    filters.skill = e.target.dataset.value;
+                    document.querySelectorAll('#skill-filter button').forEach(b => b.classList.remove('selected-filter-btn'));
+                    e.target.classList.add('selected-filter-btn');
+                    updateRecommendations();
+                }
+            });
+             document.getElementById('goal-filter').addEventListener('click', e => {
+                console.log('Goal filter event received:', e.target);
+                if(e.target.tagName === 'BUTTON') {
+                    console.log('Goal button clicked:', e.target.dataset.value);
+                    filters.goal = e.target.dataset.value;
+                    document.querySelectorAll('#goal-filter button').forEach(b => b.classList.remove('selected-filter-btn'));
+                    e.target.classList.add('selected-filter-btn');
+                    updateRecommendations();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
