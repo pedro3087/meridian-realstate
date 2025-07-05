@@ -5,10 +5,47 @@
 ### Prerequisites
 1. **Google Cloud Account**: Sign up at [cloud.google.com](https://cloud.google.com)
 2. **Google Cloud CLI**: Install from [cloud.google.com/sdk/docs/install](https://cloud.google.com/sdk/docs/install)
+   - **Windows**: Download the Windows installer from the link above
 3. **Docker**: Install from [docker.com](https://docker.com)
+   - **Windows**: Install [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
 
 ### Step 1: Set Up Google Cloud Project
 
+**For Windows PowerShell:**
+```powershell
+# Initialize Google Cloud CLI
+gcloud init
+
+# Create a new project (or use existing)
+gcloud projects create meridian-automation-tool --name="Meridian Automation Tool"
+
+# Set the project as active
+gcloud config set project meridian-automation-tool
+
+# Enable required APIs
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com
+gcloud services enable containerregistry.googleapis.com
+```
+
+**For Command Prompt:**
+```cmd
+# Initialize Google Cloud CLI
+gcloud init
+
+# Create a new project (or use existing)
+gcloud projects create meridian-automation-tool --name="Meridian Automation Tool"
+
+# Set the project as active
+gcloud config set project meridian-automation-tool
+
+# Enable required APIs
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com
+gcloud services enable containerregistry.googleapis.com
+```
+
+**For Git Bash/WSL:**
 ```bash
 # Initialize Google Cloud CLI
 gcloud init
