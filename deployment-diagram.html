@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Cloud Deployment Sequence Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #264653 0%, #2A9D8F 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px;
+        }
+        .diagram-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+        .phase-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        .phase-info h3 {
+            margin: 0 0 15px 0;
+            color: #1976d2;
+            font-size: 1.3em;
+        }
+        .phase-info ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .phase-info li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .benefits {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        .benefits h3 {
+            margin: 0 0 15px 0;
+            color: #2e7d32;
+        }
+        .cost-info {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        .cost-info h3 {
+            margin: 0 0 15px 0;
+            color: #e65100;
+        }
+        .export-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .export-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+        .mermaid {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Google Cloud Deployment</h1>
+            <p>Complete Sequence Diagram - From Local to Production</p>
+        </div>
+        
+        <div class="content">
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local Machine
+    participant Docker as Docker Engine
+    participant GCR as Google Container Registry
+    participant GCP as Google Cloud Platform
+    participant CloudRun as Cloud Run Service
+    participant CDN as Global CDN
+    participant User as End User
+
+    Note over Dev,User: Phase 1: Initial Setup
+    Dev->>Local: Install Google Cloud CLI
+    Dev->>Local: Install Docker
+    Dev->>GCP: gcloud init
+    GCP-->>Dev: Authentication & Project Setup
+    Dev->>GCP: Enable APIs (Cloud Build, Run, Container Registry)
+    GCP-->>Dev: APIs Enabled
+
+    Note over Dev,User: Phase 2: Docker Configuration
+    Dev->>GCP: gcloud auth configure-docker
+    GCP-->>Local: Docker credentials configured
+    Local->>Docker: docker build -t gcr.io/PROJECT_ID/facebook-automation-tool .
+    Docker-->>Local: Docker image built successfully
+
+    Note over Dev,User: Phase 3: Image Push
+    Local->>Docker: docker push gcr.io/PROJECT_ID/facebook-automation-tool
+    Docker->>GCR: Push image to Google Container Registry
+    GCR-->>Docker: Image stored successfully
+    Docker-->>Local: Push completed
+
+    Note over Dev,User: Phase 4: Cloud Run Deployment
+    Local->>GCP: gcloud run deploy facebook-automation-tool
+    GCP->>GCR: Pull image from registry
+    GCR-->>GCP: Image retrieved
+    GCP->>CloudRun: Create/Update service
+    CloudRun-->>GCP: Service deployed successfully
+    GCP-->>Local: Service URL provided
+
+    Note over Dev,User: Phase 5: Service Configuration
+    GCP->>CloudRun: Configure auto-scaling (0-10 instances)
+    GCP->>CloudRun: Set memory (512Mi) and CPU (1)
+    GCP->>CloudRun: Enable HTTPS/SSL
+    GCP->>CloudRun: Configure load balancing
+    CloudRun-->>GCP: Configuration applied
+
+    Note over Dev,User: Phase 6: Monitoring Setup
+    GCP->>GCP: Enable Cloud Monitoring
+    GCP->>GCP: Enable Cloud Logging
+    GCP->>CloudRun: Set up health checks
+    CloudRun-->>GCP: Monitoring active
+
+    Note over Dev,User: Phase 7: CDN & Global Distribution
+    GCP->>CDN: Configure global CDN
+    CDN->>CloudRun: Cache static assets
+    CloudRun-->>CDN: Assets cached globally
+
+    Note over Dev,User: Phase 8: User Access
+    User->>CDN: Request application
+    CDN->>CloudRun: Forward request
+    CloudRun->>CloudRun: Process request
+    CloudRun-->>CDN: Return response
+    CDN-->>User: Serve application
+
+    Note over Dev,User: Phase 9: Auto-scaling (When Traffic Increases)
+    User->>CDN: Multiple concurrent requests
+    CDN->>CloudRun: Forward requests
+    CloudRun->>CloudRun: Scale up instances automatically
+    CloudRun-->>CDN: Handle increased load
+    CDN-->>User: Serve all requests
+
+    Note over Dev,User: Phase 10: Monitoring & Logging
+    CloudRun->>GCP: Send metrics and logs
+    GCP->>GCP: Store monitoring data
+    GCP->>Dev: Alert if issues detected (optional)
+                </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportAsPNG()">📷 Export as PNG</button>
+                <button class="export-btn" onclick="exportAsSVG()">🎨 Export as SVG</button>
+                <button class="export-btn" onclick="openInMermaidLive()">🔗 Open in Mermaid Live</button>
+            </div>
+
+            <div class="phase-info">
+                <h3>📋 10-Phase Deployment Process</h3>
+                <ul>
+                    <li><strong>Phase 1-3:</strong> Setup & Containerization (Install tools, build Docker image, push to registry)</li>
+                    <li><strong>Phase 4-6:</strong> Cloud Deployment (Deploy to Cloud Run, configure service, set up monitoring)</li>
+                    <li><strong>Phase 7-10:</strong> Production & Scaling (CDN setup, user access, auto-scaling, monitoring)</li>
+                </ul>
+            </div>
+
+            <div class="benefits">
+                <h3>🌟 Key Benefits</h3>
+                <ul>
+                    <li><strong>Zero Local Resources:</strong> Application runs entirely in Google Cloud</li>
+                    <li><strong>Automatic Scaling:</strong> Handles traffic spikes without manual intervention</li>
+                    <li><strong>Global Performance:</strong> CDN ensures fast loading worldwide</li>
+                    <li><strong>High Availability:</strong> Multiple instances and health checks</li>
+                    <li><strong>Cost Optimization:</strong> Pay only for actual usage</li>
+                    <li><strong>Security:</strong> Automatic SSL and secure container execution</li>
+                </ul>
+            </div>
+
+            <div class="cost-info">
+                <h3>💰 Cost Breakdown</h3>
+                <ul>
+                    <li><strong>Container Registry:</strong> $0.026/GB/month</li>
+                    <li><strong>Cloud Run:</strong> $0.40/million requests</li>
+                    <li><strong>CDN:</strong> $0.08/GB</li>
+                    <li><strong>Monitoring:</strong> Free tier included</li>
+                    <li><strong>Estimated Monthly Cost:</strong> $5-15 for typical usage</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            },
+            sequence: {
+                useMaxWidth: true,
+                diagramMarginX: 50,
+                diagramMarginY: 10,
+                actorMargin: 50,
+                width: 150,
+                height: 65,
+                boxMargin: 10,
+                boxTextMargin: 5,
+                noteMargin: 10,
+                messageMargin: 35,
+                mirrorActors: true,
+                bottomMarginAdj: 1,
+                useMaxWidth: true,
+                rightAngles: false,
+                showSequenceNumbers: false
+            }
+        });
+
+        // Export functions
+        function exportAsPNG() {
+            const svg = document.querySelector('.mermaid svg');
+            if (svg) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+                const url = URL.createObjectURL(svgBlob);
+                
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const link = document.createElement('a');
+                    link.download = 'deployment-sequence-diagram.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+                
+                img.src = url;
+            }
+        }
+
+        function exportAsSVG() {
+            const svg = document.querySelector('.mermaid svg');
+            if (svg) {
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+                const url = URL.createObjectURL(svgBlob);
+                
+                const link = document.createElement('a');
+                link.download = 'deployment-sequence-diagram.svg';
+                link.href = url;
+                link.click();
+            }
+        }
+
+        function openInMermaidLive() {
+            const mermaidCode = `sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local Machine
+    participant Docker as Docker Engine
+    participant GCR as Google Container Registry
+    participant GCP as Google Cloud Platform
+    participant CloudRun as Cloud Run Service
+    participant CDN as Global CDN
+    participant User as End User
+
+    Note over Dev,User: Phase 1: Initial Setup
+    Dev->>Local: Install Google Cloud CLI
+    Dev->>Local: Install Docker
+    Dev->>GCP: gcloud init
+    GCP-->>Dev: Authentication & Project Setup
+    Dev->>GCP: Enable APIs (Cloud Build, Run, Container Registry)
+    GCP-->>Dev: APIs Enabled
+
+    Note over Dev,User: Phase 2: Docker Configuration
+    Dev->>GCP: gcloud auth configure-docker
+    GCP-->>Local: Docker credentials configured
+    Local->>Docker: docker build -t gcr.io/PROJECT_ID/facebook-automation-tool .
+    Docker-->>Local: Docker image built successfully
+
+    Note over Dev,User: Phase 3: Image Push
+    Local->>Docker: docker push gcr.io/PROJECT_ID/facebook-automation-tool
+    Docker->>GCR: Push image to Google Container Registry
+    GCR-->>Docker: Image stored successfully
+    Docker-->>Local: Push completed
+
+    Note over Dev,User: Phase 4: Cloud Run Deployment
+    Local->>GCP: gcloud run deploy facebook-automation-tool
+    GCP->>GCR: Pull image from registry
+    GCR-->>GCP: Image retrieved
+    GCP->>CloudRun: Create/Update service
+    CloudRun-->>GCP: Service deployed successfully
+    GCP-->>Local: Service URL provided
+
+    Note over Dev,User: Phase 5: Service Configuration
+    GCP->>CloudRun: Configure auto-scaling (0-10 instances)
+    GCP->>CloudRun: Set memory (512Mi) and CPU (1)
+    GCP->>CloudRun: Enable HTTPS/SSL
+    GCP->>CloudRun: Configure load balancing
+    CloudRun-->>GCP: Configuration applied
+
+    Note over Dev,User: Phase 6: Monitoring Setup
+    GCP->>GCP: Enable Cloud Monitoring
+    GCP->>GCP: Enable Cloud Logging
+    GCP->>CloudRun: Set up health checks
+    CloudRun-->>GCP: Monitoring active
+
+    Note over Dev,User: Phase 7: CDN & Global Distribution
+    GCP->>CDN: Configure global CDN
+    CDN->>CloudRun: Cache static assets
+    CloudRun-->>CDN: Assets cached globally
+
+    Note over Dev,User: Phase 8: User Access
+    User->>CDN: Request application
+    CDN->>CloudRun: Forward request
+    CloudRun->>CloudRun: Process request
+    CloudRun-->>CDN: Return response
+    CDN-->>User: Serve application
+
+    Note over Dev,User: Phase 9: Auto-scaling (When Traffic Increases)
+    User->>CDN: Multiple concurrent requests
+    CDN->>CloudRun: Forward requests
+    CloudRun->>CloudRun: Scale up instances automatically
+    CloudRun-->>CDN: Handle increased load
+    CDN-->>User: Serve all requests
+
+    Note over Dev,User: Phase 10: Monitoring & Logging
+    CloudRun->>GCP: Send metrics and logs
+    GCP->>GCP: Store monitoring data
+    GCP->>Dev: Alert if issues detected (optional)`;
+            
+            const encodedCode = encodeURIComponent(mermaidCode);
+            window.open(`https://mermaid.live/edit#pako:${encodedCode}`, '_blank');
+        }
+    </script>
+</body>
+</html> 
